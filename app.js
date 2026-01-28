@@ -1,7 +1,6 @@
-
-const express = require("express"); //1
-const cors = require("cors"); //2
-const openAIrouter = require("./router/openAI.route");
+import express from "express";              // 1
+import cors from "cors";                    // 2
+import openAIrouter from "./router/openAI.route.js"; // ⚠️ extension REQUIRED in ESM
 
 const app = express();
 
@@ -16,21 +15,23 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use("/bot", openAIrouter);
+
 app.get("/", (req, res) => {
-  res.status(200).json({ success: true, error: "Hello" });
+  res.status(200).json({ success: true, message: "Hello" });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  console.error(err);
-  res
-    .status(500)
-    .json({ success: false, error: "Something went wrong!", message: err });
+  console.error(err.stack || err);
+  res.status(500).json({
+    success: false,
+    error: "Something went wrong!",
+    message: err?.message || err,
+  });
 });
 
-// 404 handler (should be placed at the end of all routes)
-app.use((req, res, next) => {
+// 404 handler (must be last)
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Route not found",
@@ -38,7 +39,12 @@ app.use((req, res, next) => {
   });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// ⚠️ Vercel note: app.listen is ignored for serverless,
+// but keeping it doesn't break local dev
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+export default app; // ✅ required for Vercel

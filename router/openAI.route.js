@@ -1,12 +1,13 @@
-const express = require("express");
+import express from "express";
+import { body, validationResult } from "express-validator";
+import openAIControllersBot from "../controllers/openAI.controler.js"; // ⚠️ .js required
+
 const openAIrouter = express.Router();
-const openAIControlersBot = require("../controllers/openAI.controler");
-const { body,validationResult } = require("express-validator");
 
 const validatePayloadOpenAI = [
   body("botType").exists().withMessage("B-Type is required"),
   body("message").exists().withMessage("Message is required"),
-  body("type").exists().withMessage("Type  is required"),
+  body("type").exists().withMessage("Type is required"),
 ];
 
 // Middleware to handle validation errors
@@ -18,12 +19,12 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// get response
+// POST: get response
 openAIrouter.post(
   "/chat",
   validatePayloadOpenAI,
-  handleValidationErrors, // Add this middleware
-  openAIControlersBot.getResponseChat
+  handleValidationErrors,
+  openAIControllersBot.getResponseChat
 );
 
-module.exports = openAIrouter;
+export default openAIrouter;
