@@ -1,6 +1,9 @@
-import express from "express";              // 1
-import cors from "cors";                    // 2
-import openAIrouter from "./router/openAI.route.js"; // ⚠️ extension REQUIRED in ESM
+import dotenv from "dotenv";
+dotenv.config(); // 🔥 MUST BE FIRST
+
+import express from "express";
+import cors from "cors";
+import openAIrouter from "./router/openAI.route.js";
 
 const app = express();
 
@@ -20,7 +23,6 @@ app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Hello" });
 });
 
-// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack || err);
   res.status(500).json({
@@ -30,7 +32,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler (must be last)
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -39,12 +40,10 @@ app.use((req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-// ⚠️ Vercel note: app.listen is ignored for serverless,
-// but keeping it doesn't break local dev
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-export default app; // ✅ required for Vercel
+export default app;
